@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#071D1B">
+<title>Padel &amp; BBQ — The Players Collection</title>
+<style>
+  /* A paleta é a dos próprios posters: verde escuro, creme, dourado. O fundo tem de ser
+     EXACTAMENTE o do poster, senão as barras laterais denunciam-se numa TV. */
+  :root{ --fundo:#071D1B; --creme:#f5f0e4; --ouro:#d2b17b }
+  *{ box-sizing:border-box; margin:0; padding:0 }
+  html,body{ height:100%; background:var(--fundo); overflow:hidden }
+  body{ font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--creme) }
+
+  /* ⛔ `contain`: o poster aparece INTEIRO, nunca cortado. Numa TV 16:9 com um vídeo 16:9
+     não sobra nada; noutra proporção sobram barras da cor do fundo, que é o correcto. */
+  #v{ position:fixed; inset:0; width:100%; height:100%; object-fit:contain;
+      background:var(--fundo); display:block }
+
+  /* Os controlos escondem-se sozinhos — numa TV ninguém os quer a tapar o poster. */
+  #barra{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%);
+    display:flex; gap:10px; align-items:center;
+    background:rgba(7,29,27,.92); border:1px solid rgba(210,177,123,.45);
+    border-radius:14px; padding:10px 14px; backdrop-filter:blur(6px);
+    opacity:0; transition:opacity .25s; pointer-events:none }
+  body.mexeu #barra{ opacity:1; pointer-events:auto }
+  body.mexeu{ cursor:default }
+  body{ cursor:none }
+
+  button{ font:inherit; font-size:14px; font-weight:600; color:var(--creme);
+    background:#14322d; border:1px solid rgba(210,177,123,.45); border-radius:10px;
+    padding:10px 16px; min-height:44px; cursor:pointer; letter-spacing:.02em }
+  button:hover{ border-color:var(--ouro) }
+  #estado{ font-size:13px; color:var(--ouro); min-width:74px; text-align:center;
+    font-variant-numeric:tabular-nums }
+
+  /* 🔴 O ecrã de arranque. Fica escondido e SÓ aparece se o browser recusar a reprodução
+     automática — que é precisamente o caso que a TV do bar pode trazer. */
+  #arranque{ position:fixed; inset:0; display:none; flex-direction:column;
+    align-items:center; justify-content:center; gap:26px; text-align:center;
+    background:var(--fundo); padding:24px; z-index:10 }
+  body.bloqueado #arranque{ display:flex }
+  #arranque h1{ font-size:clamp(20px,3.4vw,40px); font-weight:700; letter-spacing:.01em }
+  #arranque p{ color:var(--ouro); font-size:clamp(13px,1.5vw,18px) }
+  #comecar{ font-size:clamp(16px,2vw,22px); padding:18px 40px; min-height:60px;
+    background:var(--ouro); color:#071D1B; border-color:var(--ouro) }
+
+  #aviso{ position:fixed; left:50%; top:28px; transform:translateX(-50%);
+    background:rgba(7,29,27,.94); border:1px solid rgba(210,177,123,.45);
+    border-radius:12px; padding:12px 18px; font-size:14px; display:none; z-index:9 }
+  body.falhou #aviso{ display:block }
+</style>
+</head>
+<body>
+
+<video id="v" autoplay muted loop playsinline preload="auto" disablepictureinpicture
+       poster="" aria-label="Padel & BBQ — The Players Collection"></video>
+
+<div id="aviso">Sem ligação ao vídeo. A tentar outra vez…</div>
+
+<div id="barra">
+  <button id="full" type="button">Ecrã inteiro</button>
+  <button id="reiniciar" type="button">Recomeçar</button>
+  <span id="estado">—</span>
+</div>
+
+<div id="arranque">
+  <h1>Padel &amp; BBQ<br>The Players Collection</h1>
+  <p>O browser bloqueou o arranque automático.</p>
+  <button id="comecar" type="button">Iniciar apresentação</button>
+</div>
+
+<script>
+(function(){
+  var v = document.getElementById('v');
+  var corpo = document.body;
+  var estado = document.getElementById('estado');
+
+  /* ⚠️ A fonte é definida por JS e não no HTML de propósito: assim um browser que não
+     perceba MP4 não fica com um elemento quebrado antes de podermos reagir. */
+  v.src = 'colecao.mp4';
+
+  /* ---------------------------------------------------------------- arrancar */
+  function tentar(){
+    var p = v.play();
+    if(p && p.catch){
+      p.then(function(){ corpo.classList.remove('bloqueado'); })
+       .catch(function(){ corpo.classList.add('bloqueado'); });
+    }
+  }
+
+  document.getElementById('comecar').addEventListener('click', function(){
+    corpo.classList.remove('bloqueado');
+    v.muted = true;                 /* ⛔ sem som, sempre: é o que a TV do bar precisa */
+    tentar();
+    cheio();                        /* o toque do operador é a única altura em que o
+                                       browser deixa pedir ecrã inteiro */
+  });
+
+  /* ---------------------------------------------------------------- ecrã inteiro */
+  function cheio(){
+    try{
+      if(document.fullscreenElement){ document.exitFullscreen(); return; }
+      var e = document.documentElement;
+      (e.requestFullscreen || e.webkitRequestFullscreen || function(){}).call(e);
+    }catch(_){}
+  }
+  document.getElementById('full').addEventListener('click', cheio);
+
+  document.getElementById('reiniciar').addEventListener('click', function(){
+    try{ v.currentTime = 0; }catch(_){}
+    tentar();
+  });
+
+  /* ---------------------------------------------------------------- controlos */
+  var esconder;
+  function mexeu(){
+    corpo.classList.add('mexeu');
+    clearTimeout(esconder);
+    esconder = setTimeout(function(){ corpo.classList.remove('mexeu'); }, 3500);
+  }
+  ['mousemove','touchstart','keydown','click'].forEach(function(ev){
+    document.addEventListener(ev, mexeu, {passive:true});
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'f' || e.key === 'F'){ cheio(); }
+  });
+
+  /* ---------------------------------------------------------------- o contador */
+  var TOTAL = 23, SEGS = 3;
+  function pinta(){
+    var t = v.currentTime || 0;
+    var n = Math.min(TOTAL, Math.floor(t / SEGS) + 1);
+    estado.textContent = (v.paused ? '❚❚ ' : '') + n + ' / ' + TOTAL;
+  }
+  v.addEventListener('timeupdate', pinta);
+  v.addEventListener('pause', pinta);
+  v.addEventListener('play', pinta);
+
+  /* ----------------------------------------------------------------
+     🔴 O CÃO DE GUARDA. Uma TV fica ligada horas sem ninguém lá: um soluço de rede, uma
+     pausa do sistema ou um separador que o browser suspendeu deixam o ecrã parado num
+     poster para sempre, e ninguém dá por isso. Se o tempo não avançar, recomeça-se.
+     ⚖️ Compara-se o `currentTime` com o de há 10 s — medir é a única forma de distinguir
+     «está a tocar» de «parece que está a tocar». */
+  var ultimo = -1, parado = 0;
+  setInterval(function(){
+    if(corpo.classList.contains('bloqueado')) return;
+    var t = v.currentTime || 0;
+    if(Math.abs(t - ultimo) < 0.05){
+      parado++;
+      if(parado >= 2){            /* ~10 s sem avançar */
+        parado = 0;
+        corpo.classList.remove('falhou');
+        tentar();
+      }
+    }else{
+      parado = 0;
+      corpo.classList.remove('falhou');
+    }
+    ultimo = t;
+  }, 5000);
+
+  v.addEventListener('error', function(){
+    corpo.classList.add('falhou');
+    setTimeout(function(){ v.load(); tentar(); }, 4000);
+  });
+  v.addEventListener('stalled', function(){ corpo.classList.add('falhou'); });
+  v.addEventListener('playing', function(){ corpo.classList.remove('falhou'); });
+  v.addEventListener('ended', function(){ try{ v.currentTime = 0; }catch(_){} tentar(); });
+
+  /* ⚠️ Um separador escondido é suspenso pelo browser; ao voltar, recomeça-se. */
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden) tentar();
+  });
+
+  /* ---------------------------------------------------------------- ecrã aceso */
+  /* Melhor esforço: impede a TV de escurecer. Não existe em todos os browsers, e uma
+     recusa aqui não pode derrubar nada — daí o try/catch e o silêncio. */
+  var bloqueio = null;
+  function acordado(){
+    try{
+      if(navigator.wakeLock && !bloqueio){
+        navigator.wakeLock.request('screen').then(function(b){
+          bloqueio = b;
+          b.addEventListener('release', function(){ bloqueio = null; });
+        }).catch(function(){});
+      }
+    }catch(_){}
+  }
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) acordado(); });
+  v.addEventListener('playing', acordado);
+
+  tentar();
+  mexeu();
+})();
+</script>
+</body>
+</html>
