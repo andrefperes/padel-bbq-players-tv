@@ -80,7 +80,11 @@
 
   /* ⚠️ A fonte é definida por JS e não no HTML de propósito: assim um browser que não
      perceba MP4 não fica com um elemento quebrado antes de podermos reagir. */
-  v.src = 'colecao.mp4';
+  /* 🔴 O NOME TEM A DATA DE PROPÓSITO. Quando o ficheiro se chamava sempre `colecao.mp4`,
+     uma TV que já o tivesse aberto continuava a mostrar a versão antiga — a cache serve
+     pelo URL, e o URL não mudava. Cada versão nova leva nome novo: é a única forma de
+     garantir que as quatro TVs vêem a mesma coisa sem ninguém lhes limpar a cache. */
+  v.src = 'colecao-20261109.mp4';
 
   /* ---------------------------------------------------------------- arrancar */
   function tentar(){
