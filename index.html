@@ -84,7 +84,7 @@
      uma TV que já o tivesse aberto continuava a mostrar a versão antiga — a cache serve
      pelo URL, e o URL não mudava. Cada versão nova leva nome novo: é a única forma de
      garantir que as quatro TVs vêem a mesma coisa sem ninguém lhes limpar a cache. */
-  v.src = 'colecao-20261109.mp4';
+  v.src = 'colecao-sponsors-20261114-v1.mp4';
 
   /* ---------------------------------------------------------------- arrancar */
   function tentar(){
@@ -133,7 +133,7 @@
   });
 
   /* ---------------------------------------------------------------- o contador */
-  var TOTAL = 23, SEGS = 3;
+  var TOTAL = 27, SEGS = 3;
   function pinta(){
     var t = v.currentTime || 0;
     var n = Math.min(TOTAL, Math.floor(t / SEGS) + 1);
