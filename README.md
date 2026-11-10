@@ -10,3 +10,7 @@ Página pública para as televisões do bar, sem login.
 
 Página: `index.html`. Vídeo atual: `colecao-sponsors-20261114-v1.mp4` (H.264, 1920×1080, 25 fps).
 Cada atualização usa um nome de vídeo novo para evitar versões antigas em cache nas TVs.
+
+## TV dedicada aos sponsors
+
+Abrir `sponsors/`: Center Court, FORM e BIBI, todos sempre visíveis, destaque alternado a cada 3 segundos. Ciclo de 9 segundos, sem som, evento de 14 Nov 2026. SLIM removido desta versão.
