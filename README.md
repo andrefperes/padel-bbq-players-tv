@@ -13,4 +13,4 @@ Cada atualização usa um nome de vídeo novo para evitar versões antigas em ca
 
 ## TV dedicada aos sponsors
 
-Abrir `sponsors/`: Center Court, FORM e BIBI, todos sempre visíveis, destaque alternado a cada 3 segundos. Ciclo de 9 segundos, sem som, evento de 14 Nov 2026. SLIM removido desta versão.
+Abrir `sponsors/`: Center Court, FORM, BIBI e Sterling, todos sempre visíveis, destaque alternado a cada 3 segundos. Ciclo de 12 segundos, sem som, evento de 14 Nov 2026. SLIM removido desta versão.
